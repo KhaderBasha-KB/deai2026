@@ -1,0 +1,73 @@
+{
+  "dataset_business_purpose": "Stores internal employee records for a financial institution or multi-branch organization, tracking staff demographics, branch assignments, reporting lines, and job roles.",
+  "recommended_target_table": "dim_employee",
+  "candidate_primary_key": [
+    "EmployeeID"
+  ],
+  "recommended_partition_column": "BranchID",
+  "column_analysis": [
+    {
+      "column_name": "BranchID",
+      "business_meaning": "Unique identifier for the branch where the employee is assigned.",
+      "recommended_data_type": "INT",
+      "nullable": "NOT NULL"
+    },
+    {
+      "column_name": "EmployeeID",
+      "business_meaning": "Unique identifier for the employee (contains nulls in source data, so this must be handled during ingestion).",
+      "recommended_data_type": "INT",
+      "nullable": "NULL"
+    },
+    {
+      "column_name": "FirstName",
+      "business_meaning": "The first name of the employee.",
+      "recommended_data_type": "VARCHAR(50)",
+      "nullable": "NOT NULL"
+    },
+    {
+      "column_name": "Hiredate",
+      "business_meaning": "The date the employee was hired (formatted as DD-MM-YYYY in source).",
+      "recommended_data_type": "DATE",
+      "nullable": "NOT NULL"
+    },
+    {
+      "column_name": "LastName",
+      "business_meaning": "The last name of the employee.",
+      "recommended_data_type": "VARCHAR(50)",
+      "nullable": "NOT NULL"
+    },
+    {
+      "column_name": "ManagerID",
+      "business_meaning": "The EmployeeID of the employee's direct manager.",
+      "recommended_data_type": "INT",
+      "nullable": "NULL"
+    },
+    {
+      "column_name": "Position",
+      "business_meaning": "The job title or position held by the employee within the organization.",
+      "recommended_data_type": "VARCHAR(50)",
+      "nullable": "NOT NULL"
+    }
+  ],
+  "possible_foreign_keys": [
+    {
+      "column": "BranchID",
+      "referenced_table": "dim_branch",
+      "referenced_column": "BranchID",
+      "confidence": "Likely (Pending verification against a branch dimension table)"
+    },
+    {
+      "column": "ManagerID",
+      "referenced_table": "dim_employee",
+      "referenced_column": "EmployeeID",
+      "confidence": "Likely self-referencing foreign key"
+    }
+  ],
+  "data_quality_concerns": [
+    "EmployeeID has 7 null values (0.23%) and is stored as float64, which is unexpected for an ID field.",
+    "ManagerID has a high null percentage (34.57%), which may be normal for top-level executives but could also indicate missing organizational data.",
+    "Position column contains typographical errors and inconsistent naming conventions (e.g., 'Manager', 'Manger', 'Manage').",
+    "Hiredate is stored as a string in 'DD-MM-YYYY' format and requires explicit parsing to a standard DATE type.",
+    "EmployeeID has duplicate or near-unique discrepancies where actual_count is 3000 but unique_count is 2993, indicating potential duplicate records."
+  ]
+}
